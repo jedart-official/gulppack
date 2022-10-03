@@ -1,0 +1,5 @@
+body {
+    background-color: antiquewhite;
+}
+
+@import "./css_parts/all.css";

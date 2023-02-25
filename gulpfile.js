@@ -1,44 +1,37 @@
 /*
-ИМПОРТЫ ПЛАГИНОВ GULP
+=======================================================
+ИМПОРТЫ ПЛАГИНОВ И НАСТРОЕК GULP
 =======================================================
 */
-const gulp = require("gulp");
-const browserSync = require("browser-sync");
-const yargs = require("yargs");
+import gulp from "gulp";
+import { create } from "browser-sync";
+import { path } from "./gulp/config/path.js";
 /*
-КОНФИГ 
 =======================================================
-*/
-const path = require("./gulp/config.js");
-/*
 ИМПОРТЫ ЗАДАЧ GULP
 =======================================================
 */
-
-const javascript = require("./gulp/gulp-tasks/javascript/js.js");
-const sepateJavascript = require("./gulp/gulp-tasks/javascript/separateJS.js");
-const scss = require("./gulp/gulp-tasks/styles/styles.js");
-const html = require("./gulp/gulp-tasks/html/html.js");
-const pages = require("./gulp/gulp-tasks/html/pagesHtml.js");
-const images = require("./gulp/gulp-tasks/images/image.js");
-const svg = require("./gulp/gulp-tasks/images/svg.js");
-const fonts = require("./gulp/gulp-tasks/fonts.js");
-const cleanDir = require("./gulp/gulp-tasks/clean.js");
-const server = browserSync.create();
-
+import { javascript } from "./gulp/tasks/javascript.js";
+import { style } from "./gulp/tasks/styles.js";
+import { html, pages } from "./gulp/tasks/html.js";
+import { images } from "./gulp/tasks/image.js";
+import { fonts } from "./gulp/tasks/fonts.js";
+import { cleanDir } from "./gulp/tasks/clean.js";
 /*
-ОСНОВНЫЕ ЗАДАЧИ GULP
+=======================================================
+НАСТРОЙКИ СЕРВЕРА GULP
 =======================================================
 */
+const server = create();
 const serve = () => {
     server.init({
         server: {
-            baseDir: "dist",
+            baseDir: path.build.html,
         },
     });
 };
-
 /*
+=======================================================
 ГЛОБАЛЬНЫЕ НАСТРОЙКИ GULP
 =======================================================
 */
@@ -47,40 +40,39 @@ global.app = {
     isBuild: process.argv.includes("--build"),
     gulp,
     server,
-    yargs,
     path,
 };
-
 /*
+=======================================================
 РАСПРЕДЕЛЕНИЕ ЗАДАЧ
 =======================================================
 */
 const mainTasks = gulp.series(
-    gulp.parallel(
-        cleanDir,
-        scss,
-        javascript,
-        sepateJavascript,
-        html,
-        pages,
-        images,
-        svg,
-        fonts
-    )
+    cleanDir,
+    gulp.parallel(html, pages, style, javascript, images, fonts)
 );
+/*
+=======================================================
+ПРОВЕРКА НА ИЗМЕНЕНИЯ
+=======================================================
+*/
 const watcher = () => {
     gulp.watch(path.src.fonts, fonts);
-    gulp.watch(path.src.images, images, svg);
-    gulp.watch(path.src.scss, scss);
-    gulp.watch(["./src/*.html", "./src/**/*.html"], html, pages);
-    gulp.watch("./src/js/**/*.js", javascript, sepateJavascript);
-    gulp.watch("dist/*.html").on("change", server.reload);
+    gulp.watch([path.src.images, path.src.svg], images);
+    gulp.watch(path.src.scss, style);
+    gulp.watch(path.src.pages, pages);
+    gulp.watch(path.src.html, html);
+    gulp.watch([path.src.js, path.src.separateJS], javascript);
 };
-
 /*
+=======================================================
 СЦЕНАРИИ ЗАДАЧ
 =======================================================
 */
 const dev = gulp.series(mainTasks, gulp.parallel(watcher, serve));
-
+/*
+=======================================================
+ЗАПУСК ЗАДАЧИ
+=======================================================
+*/
 gulp.task("default", dev);

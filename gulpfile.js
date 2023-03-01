@@ -61,7 +61,7 @@ const watcher = () => {
     gulp.watch([path.src.images, path.src.svg], images);
     gulp.watch(path.src.scss, style);
     gulp.watch(path.src.pages, pages);
-    gulp.watch(path.src.html, html);
+    gulp.watch([path.src.html, path.src.components], html);
     gulp.watch([path.src.js, path.src.separateJS], javascript);
 };
 /*

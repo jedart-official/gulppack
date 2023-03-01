@@ -21,6 +21,7 @@ export const path = {
         html: `${srcFolder}/index.html`,
         pages: `${srcFolder}/pages/**/*.html`,
         fonts: `${srcFolder}/fonts/*.{woff, woff2, ttf}`,
+        components: `${srcFolder}/components/**/*.html`,
     },
     build: {
         js: `${buildFolder}/js/`,
